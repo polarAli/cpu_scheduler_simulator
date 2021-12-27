@@ -2,12 +2,6 @@
 Process class for the scheduler simulation.
 """
 
-import os
-import sys
-import time
-import signal
-import subprocess
-import threading
 import logging
 
 from state import State
