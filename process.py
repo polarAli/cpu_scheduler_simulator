@@ -26,7 +26,6 @@ class Process:
         self.io_time = 0
         self.turnaround_time = 0
         self.state = State.READY
-        self.logger = logging.getLogger(__name__)
 
     @property
     def waiting_time(self):
