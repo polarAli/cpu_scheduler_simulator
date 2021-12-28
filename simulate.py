@@ -101,7 +101,7 @@ class Simulate:
         5. Average turnaround time
         6. Average response time
         """
-        print('Simulation time: %.2f' % self.run_time)
+        print('Simulation time: %.10f s' % self.run_time)
         print('CPU utilization: %.2f%%' % self.cpu_utilization)
         print('Throughput: %.2f' % self.throughput)
         print('Average waiting time: %.2f' % self.average_waiting_time)
