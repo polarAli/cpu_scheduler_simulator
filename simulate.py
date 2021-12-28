@@ -15,7 +15,7 @@ parser.add_argument('-a', '--algorithm', type=str, help='algorithm name')
 
 class Simulate:
     """
-    Simulate the scheduling algorithm and plot the following:
+    Simulate the scheduling algorithm and print the following:
     1. Simulation time
     2. CPU utilization
     3. Throughput
@@ -42,7 +42,7 @@ class Simulate:
         """
         with open(self.process_file, 'r') as f:
             data = json.load(f)
-            for process in data['processes']:
+            for process in data:
                 self.processes.append(
                     Process(
                         pid=process['pid'],
@@ -55,7 +55,7 @@ class Simulate:
 
     def run(self):
         """
-        Run the scheduling algorithm, then save the results and call plot() to plot the result.
+        Run the scheduling algorithm, then save the results.
         """
 
         self.read_process()
@@ -75,7 +75,7 @@ class Simulate:
         start_time = time.time()
 
         # Run the algorithm
-        algorithm.run()
+        result = algorithm.run()
 
         # End python timer
         end_time = time.time()
@@ -84,13 +84,14 @@ class Simulate:
         self.run_time = end_time - start_time
 
         # Get the results
-        self.cpu_utilization = algorithm.cpu_utilization
-        self.throughput = algorithm.throughput
-        self.average_waiting_time = algorithm.average_waiting_time
-        self.average_turnaround_time = algorithm.average_turnaround_time
-        self.average_response_time = algorithm.average_response_time
+        self.cpu_utilization = result['cpu_utilization']
+        self.throughput = result['throughput']
+        self.average_waiting_time = result['average_waiting_time']
+        self.average_turnaround_time = result['average_turnaround_time']
+        self.average_response_time = result['average_response_time']
+        self.processes = result['processes']
 
-    def plot(self):
+    def print(self):
         """
         Plot the following:
         1. Simulation time
@@ -106,3 +107,10 @@ class Simulate:
         print('Average waiting time: %.2f' % self.average_waiting_time)
         print('Average turnaround time: %.2f' % self.average_turnaround_time)
         print('Average response time: %.2f' % self.average_response_time)
+
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    simulate = Simulate(args.process, args.algorithm)
+    simulate.run()
+    simulate.print()
