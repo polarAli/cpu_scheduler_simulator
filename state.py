@@ -9,6 +9,7 @@ class State:
     BLOCKED = 4
     SUSPENDED = 5
     UNKNOWN = 6
+    EXECUTED = 7
 
     def __init__(self):
         self.state = State.UNKNOWN
@@ -32,5 +33,7 @@ class State:
             return "BLOCKED"
         elif self.state == State.SUSPENDED:
             return "SUSPENDED"
+        elif self.state == State.EXECUTED:
+            return "EXECUTED"
         else:
             return "UNKNOWN"
