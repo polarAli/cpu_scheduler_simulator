@@ -1,4 +1,4 @@
-from base_algorithm import BaseAlgorithm
+from algorithms.base_algorithm import BaseAlgorithm
 from state import State
 
 

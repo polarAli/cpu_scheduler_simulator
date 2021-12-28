@@ -1,1 +1,1 @@
-from FIFO import FIFO
+from algorithms.fifo import FIFO
