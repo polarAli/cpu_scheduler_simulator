@@ -25,11 +25,5 @@ class Process:
         self.end_time = None
         self.io_time = 0
         self.turnaround_time = 0
+        self.waiting_time = 0
         self.state = State.READY
-
-    @property
-    def waiting_time(self):
-        """
-        Return the waiting time of the process.
-        """
-        return self.start_time - self.arrival_time
