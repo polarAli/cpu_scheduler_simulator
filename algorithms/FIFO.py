@@ -36,6 +36,8 @@ class FIFO(BaseAlgorithm):
                 cpu_idle_time += process.arrival_time - time
                 time = process.arrival_time
 
+            # Calculate the waiting time
+            process.waiting_time = time - process.arrival_time
             # Calculate the response time
             process.response_time = time - process.arrival_time
             # Calculate the turnaround time
