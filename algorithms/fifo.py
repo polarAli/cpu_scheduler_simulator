@@ -25,9 +25,9 @@ class FIFO(BaseAlgorithm):
             "average_response_time": average response time
         }
         """
-        time = 0
+        time = 0.0
         processes = []
-        cpu_idle_time = 0
+        cpu_idle_time = 0.0
         while self.processes:
             process = self.processes.pop(0)
 
@@ -56,7 +56,7 @@ class FIFO(BaseAlgorithm):
         throughput = len(processes) / time
         return {
             "processes": processes,
-            "time": time,
+            "total_time": time,
             "cpu_utilization": cpu_utilization,
             "throughput": throughput,
             "average_waiting_time": self.average_waiting_time(processes),
