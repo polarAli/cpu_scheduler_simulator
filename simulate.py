@@ -35,6 +35,7 @@ class Simulate:
         self.average_turnaround_time = 0.0
         self.average_response_time = 0.0
         self.run_time = 0
+        self.cpu_total_time = 0
 
     def read_process(self):
         """
@@ -91,6 +92,7 @@ class Simulate:
         self.average_turnaround_time = result['average_turnaround_time']
         self.average_response_time = result['average_response_time']
         self.processes = result['processes']
+        self.cpu_total_time = result['total_time']
 
     def print(self):
         """
@@ -103,8 +105,9 @@ class Simulate:
         6. Average response time
         """
         print('Simulation time: %.10f s' % self.run_time)
-        print('CPU utilization: %.2f%%' % self.cpu_utilization)
-        print('Throughput: %.2f' % self.throughput)
+        print('CPU total time: %.0f' % self.cpu_total_time)
+        print('CPU utilization: %f%%' % (self.cpu_utilization * 100))
+        print('Throughput: %.6f' % self.throughput)
         print('Average waiting time: %.2f' % self.average_waiting_time)
         print('Average turnaround time: %.2f' % self.average_turnaround_time)
         print('Average response time: %.2f' % self.average_response_time)
