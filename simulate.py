@@ -52,6 +52,7 @@ class Simulate:
                     )
                 )
                 self.process_num += 1
+        self.processes.sort(key=lambda x: x.arrival_time)
 
     def run(self):
         """
