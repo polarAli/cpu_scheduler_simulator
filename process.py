@@ -2,8 +2,6 @@
 Process class for the scheduler simulation.
 """
 
-import logging
-
 from state import State
 
 
@@ -27,3 +25,11 @@ class Process:
         self.turnaround_time = 0
         self.waiting_time = 0
         self.state = State.READY
+
+    def __str__(self):
+        """
+        Return a string representation of the process.
+        """
+        return "pid: {}, arrival_time: {}, priority: {}, remaining_time: {}".format(
+            self.pid, self.arrival_time, self.priority, self.remaining_time
+        )
