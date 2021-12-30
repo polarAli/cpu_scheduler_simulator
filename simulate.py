@@ -5,6 +5,8 @@ import argparse
 import json
 import time
 
+from matplotlib import pyplot as plt
+
 import algorithms
 from process import Process
 
@@ -112,9 +114,137 @@ class Simulate:
         print('Average turnaround time: %.2f' % self.average_turnaround_time)
         print('Average response time: %.2f' % self.average_response_time)
 
+    def plot_subset(self, processes, name, subplot):
+        """
+        Plot the processes with given name.
+        """
+        # Create a list of waiting time
+        waiting_time = []
+        for process in processes:
+            waiting_time.append(process.waiting_time)
+
+        # Create a list of turnaround time
+        turnaround_time = []
+        for process in processes:
+            turnaround_time.append(process.turnaround_time)
+
+        # Create a list of response time
+        response_time = []
+        for process in processes:
+            response_time.append(process.response_time)
+
+        # Construct the box plot
+        bp = subplot.boxplot(
+            [waiting_time, turnaround_time, response_time],
+            labels=['Waiting time', 'Turnaround time', 'Response time'],
+            patch_artist=True
+        )
+
+        # Set the colors of the boxes
+        for box in bp['boxes']:
+            box.set(color='#7570b3', linewidth=2)
+            box.set(facecolor='#1b9e77')
+
+        # Set the colors of the whiskers
+        for whisker in bp['whiskers']:
+            whisker.set(color='#7570b3', linewidth=2)
+
+        # Set the colors of the caps
+        for cap in bp['caps']:
+            cap.set(color='#7570b3', linewidth=2)
+
+        # Set the colors of the medians
+        for median in bp['medians']:
+            median.set(color='#b2df8a', linewidth=2)
+
+        # Set the colors of the fliers
+        for flier in bp['fliers']:
+            flier.set(marker='o', color='#e7298a', alpha=0.5)
+
+        # Set axis labels
+        subplot.set_xlabel('Processes')
+        subplot.set_ylabel('Time')
+
+        # Figure title
+        subplot.set_title(name)
+
+        # Figure legend
+        subplot.legend()
+
+    def plot(self):
+        """
+        Box plot the following parameters for three groups of processes:
+        1. All processes
+        2. Processes with burst time less than or equal to 10
+        3. Processes with priority less than or equal to 5
+        Parameters:
+        1. Waiting time
+        2. Turnaround time
+        3. Response time
+        """
+        # Create a figure
+        fig = plt.figure()
+
+        # Create a subplot for all processes
+        all_processes_subplot = fig.add_subplot(221)
+
+        # Create a subplot for processes with burst time less than or equal to 10
+        short_processes_subplot = fig.add_subplot(222)
+
+        # Create a subplot for processes with priority less than or equal to 5
+        high_priority_processes_subplot = fig.add_subplot(223)
+
+        # Plot the processes
+        self.plot_subset(self.processes, 'All processes', all_processes_subplot)
+        self.plot_subset(
+            [process for process in self.processes if process.burst_time <= 10],
+            'Processes with burst time less than or equal to 10',
+            short_processes_subplot
+        )
+        self.plot_subset(
+            [process for process in self.processes if process.priority <= 5],
+            'Processes with priority less than or equal to 5',
+            high_priority_processes_subplot
+        )
+
+        # Create box for text results
+        fig.text(
+            0.5, 0.25,
+            'Simulation time: %.10f s\n'
+            'CPU total time: %.0f\n'
+            'CPU utilization: %.6f%%\n'
+            'Throughput: %.6f\n'
+            'Average waiting time: %.2f\n'
+            'Average turnaround time: %.2f\n'
+            'Average response time: %.2f' % (
+                self.run_time,
+                self.cpu_total_time,
+                (self.cpu_utilization * 100),
+                self.throughput,
+                self.average_waiting_time,
+                self.average_turnaround_time,
+                self.average_response_time
+            ),
+            bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 10}
+        )
+
+        # Set the figure size
+        fig.set_size_inches(18.5, 10.5)
+
+        # Set the figure title
+        fig.canvas.manager.set_window_title(self.algorithm)
+        fig.suptitle(
+            f'{self.algorithm} scheduling algorithm results',
+            fontsize=20
+        )
+
+        # Show the figure
+        plt.show()
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
     simulate = Simulate(args.process, args.algorithm)
     simulate.run()
     simulate.print()
+    simulate.plot()
