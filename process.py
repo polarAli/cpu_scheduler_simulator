@@ -26,6 +26,13 @@ class Process:
         self.waiting_time = 0
         self.state = State.READY
 
+    @property
+    def response_time(self):
+        """
+        Return the response time of the process.
+        """
+        return self.start_time - self.arrival_time
+
     def __str__(self):
         """
         Return a string representation of the process.
