@@ -189,10 +189,10 @@ class Simulate:
         all_processes_subplot = fig.add_subplot(221)
 
         # Create a subplot for processes with burst time less than or equal to 10
-        short_processes_subplot = fig.add_subplot(222)
+        short_processes_subplot = fig.add_subplot(222, sharey=all_processes_subplot)
 
         # Create a subplot for processes with priority less than or equal to 5
-        high_priority_processes_subplot = fig.add_subplot(223)
+        high_priority_processes_subplot = fig.add_subplot(223, sharey=all_processes_subplot)
 
         # Plot the processes
         self.plot_subset(self.processes, 'All processes', all_processes_subplot)
