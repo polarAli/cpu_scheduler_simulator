@@ -38,8 +38,8 @@ class FIFO(BaseAlgorithm):
 
             # Calculate the waiting time
             process.waiting_time = time - process.arrival_time
-            # Calculate the response time
-            process.response_time = time - process.arrival_time
+            # Set process start time
+            process.start_time = time
             # Calculate the turnaround time
             process.turnaround_time = process.response_time + process.burst_time
             # Run the process
