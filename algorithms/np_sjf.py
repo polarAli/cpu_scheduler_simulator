@@ -70,7 +70,12 @@ class NonPreemptiveSJF(BaseAlgorithm):
         Get the process with the shortest remaining time among arrive processes.
         :return: Process
         """
-        processes = [process for process in self.processes if process.arrival_time <= self.time]
-        if processes:
-            return min(processes, key=lambda process: process.burst_time)
-        return None
+        min_burst_time = float("inf")
+        shortest_process = None
+        for process in self.processes:
+            if process.arrival_time > self.time:
+                break
+            if process.burst_time < min_burst_time:
+                min_burst_time = process.burst_time
+                shortest_process = process
+        return shortest_process
