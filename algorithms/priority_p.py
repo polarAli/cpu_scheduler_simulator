@@ -1,9 +1,11 @@
+import bisect
 from collections import deque
 
 from algorithms.base_algorithm import BaseAlgorithm
 
 
 class PriorityPreemptive(BaseAlgorithm):
+    process_compare_prop = 'priority'
 
     def __init__(self, processes):
         super().__init__(processes)
@@ -113,12 +115,7 @@ class PriorityPreemptive(BaseAlgorithm):
         Append process to ready queue based on priority.
         :param process: process to be appended
         """
-        if self.ready_queue:
-            for index, ready_process in enumerate(self.ready_queue):
-                if process.priority < ready_process.priority:
-                    self.ready_queue.insert(index, process)
-                    return
-        self.ready_queue.append(process)
+        bisect.insort(self.ready_queue, process)
 
     def get_next_important_time(self):
         """
