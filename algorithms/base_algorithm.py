@@ -1,3 +1,6 @@
+from collections import deque
+
+
 class BaseAlgorithm:
     """
     Base class for all algorithms.
@@ -7,7 +10,7 @@ class BaseAlgorithm:
         Initialize the algorithm.
         :param processes: list of processes to be executed.
         """
-        self.processes = processes
+        self.processes = deque(processes)
 
     def run(self):
         """
