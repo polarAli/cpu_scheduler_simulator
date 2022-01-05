@@ -1,3 +1,5 @@
+from collections import deque
+
 from algorithms.base_algorithm import BaseAlgorithm
 
 
@@ -6,7 +8,7 @@ class PriorityPreemptive(BaseAlgorithm):
     def __init__(self, processes):
         super().__init__(processes)
         # Queue of processes which are ready to execute. limited to 100 processes
-        self.ready_queue = []
+        self.ready_queue = deque([])
         self.running_process = None
         self.time = 0.0
         self.idle_time = 0.0
@@ -41,27 +43,29 @@ class PriorityPreemptive(BaseAlgorithm):
 
             arrived_processes = self.get_arrived_processes()
             if arrived_processes:
-                arrived_processes.sort(key=lambda process: process.priority)
+                highest_priority_process = min(arrived_processes, key=lambda process: process.priority)
                 if self.running_process is None:
-                    self.running_process = sorted(arrived_processes, key=lambda x: x.priority)[0]
+                    self.running_process = highest_priority_process
                     self.running_process.start_time = self.time
 
-                elif self.running_process.priority > arrived_processes[0].priority:
-                    self.ready_queue.append(self.running_process)
-                    self.running_process = arrived_processes[0]
+                elif self.running_process.priority > highest_priority_process.priority:
+                    self.append_to_ready_queue(self.running_process)
+                    self.running_process = highest_priority_process
                     self.running_process.start_time = self.time
 
-                self.remove_processes(arrived_processes)
+                for _ in range(len(arrived_processes)):
+                    self.processes.popleft()
+
                 if self.running_process in arrived_processes:
                     arrived_processes.remove(self.running_process)
-                self.ready_queue.extend(arrived_processes)
+                for process in arrived_processes:
+                    self.append_to_ready_queue(process)
                 arrived_processes.clear()
 
             # If no process is running, then pick the process from ready queue
             if self.running_process is None and self.ready_queue:
-                self.running_process = min(self.ready_queue, key=lambda x: x.priority)
+                self.running_process = self.ready_queue.popleft()
                 self.running_process.start_time = self.running_process.start_time or self.time
-                self.ready_queue.remove(self.running_process)
 
             # If process is running, then get next important time and update the time
             next_time = self.get_next_important_time()
@@ -100,28 +104,41 @@ class PriorityPreemptive(BaseAlgorithm):
         for process in self.processes:
             if process.arrival_time == self.time:
                 arrived_processes.append(process)
+            else:
+                break
         return arrived_processes
+
+    def append_to_ready_queue(self, process):
+        """
+        Append process to ready queue based on priority.
+        :param process: process to be appended
+        """
+        if self.ready_queue:
+            for index, ready_process in enumerate(self.ready_queue):
+                if process.priority < ready_process.priority:
+                    self.ready_queue.insert(index, process)
+                    return
+        self.ready_queue.append(process)
 
     def get_next_important_time(self):
         """
         Find next point of time that need a decision
         :return: Int
         """
-        processes = [process for process in self.processes if process.arrival_time > self.time]
         if self.running_process is not None:
-            if not processes:
+            if not self.processes:
                 return max(self.time + self.running_process.remaining_time, self.time)
 
             return min(
                 self.time + (self.running_process.remaining_time or 1),
-                min(process.arrival_time for process in processes)
+                self.processes[0].arrival_time
             )
 
         if self.ready_queue:
             return self.time + 1
 
-        if processes:
-            return min(process.arrival_time for process in processes)
+        if self.processes:
+            return self.processes[0].arrival_time
 
         return self.time + 1
 
