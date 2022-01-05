@@ -11,6 +11,7 @@ class BaseAlgorithm:
         :param processes: list of processes to be executed.
         """
         self.processes = deque(processes)
+        self.process_compare_prop = 'arrival_time'
 
     def run(self):
         """
