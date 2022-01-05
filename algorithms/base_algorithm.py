@@ -5,13 +5,14 @@ class BaseAlgorithm:
     """
     Base class for all algorithms.
     """
+    process_compare_prop = 'arrival_time'
+
     def __init__(self, processes):
         """
         Initialize the algorithm.
         :param processes: list of processes to be executed.
         """
         self.processes = deque(processes)
-        self.process_compare_prop = 'arrival_time'
 
     def run(self):
         """

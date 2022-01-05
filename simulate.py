@@ -39,6 +39,14 @@ class Simulate:
         self.run_time = 0
         self.cpu_total_time = 0
 
+        # Get the algorithm class
+        try:
+            self.AlgorithmClass = getattr(algorithms, self.algorithm)
+        except AttributeError:
+            print('Algorithm not found.')
+            exit(1)
+            return
+
     def read_process(self):
         """
         Read process.json file and store the processes in self.processes.
@@ -51,7 +59,8 @@ class Simulate:
                         pid=process['pid'],
                         arrival_time=process['arrival_time'],
                         burst_time=process['burst_time'],
-                        priority=process['priority']
+                        priority=process['priority'],
+                        compare_prop=self.AlgorithmClass.process_compare_prop
                     )
                 )
                 self.process_num += 1
@@ -64,16 +73,8 @@ class Simulate:
 
         self.read_process()
 
-        # Get the algorithm class
-        try:
-            AlgorithmClass = getattr(algorithms, self.algorithm)
-        except AttributeError:
-            print('Algorithm not found.')
-            exit(1)
-            return
-
         # Create the algorithm instance
-        algorithm = AlgorithmClass(self.processes)
+        algorithm = self.AlgorithmClass(self.processes)
 
         # Start python timer
         start_time = time.time()
