@@ -1,16 +1,23 @@
+import bisect
+from collections import deque
+
 from algorithms.base_algorithm import BaseAlgorithm
 
 
 class NonPreemptiveSJF(BaseAlgorithm):
+    process_compare_prop = 'remaining_time'
+
     def __init__(self, processes):
+        processes = sorted(processes, key=lambda x: (x.arrival_time, x.burst_time))
         super().__init__(processes)
-        self.time = 0.0
-        self.idle_time = 0.0
+        self.ready_queue = deque([])
+        self.running_process = None
+        self.time = 0
+        self.idle_time = 0
 
     def run(self):
         """
-        Schedule the processes using Non-Preemptive Shortest Job First
-        algorithm and calculate following information.
+        Run the algorithm.
         :return: {
             "processes": list of executed processes,
             "time": total time of execution,
@@ -22,60 +29,117 @@ class NonPreemptiveSJF(BaseAlgorithm):
         }
         """
         executed_processes = []
-        while self.processes:
-            # Get the process with the shortest remaining time
-            shortest_process = self.get_shortest_process()
-            if shortest_process:
-                # Execute the process
-                shortest_process.start_time = self.time
-                self.time += shortest_process.burst_time
-                shortest_process.end_time = self.time
-                shortest_process.turnaround_time = shortest_process.end_time - shortest_process.arrival_time
-                shortest_process.waiting_time = shortest_process.turnaround_time - shortest_process.burst_time
-                self.processes.remove(shortest_process)
-                executed_processes.append(shortest_process)
+
+        while self.processes or self.ready_queue or self.running_process:
+
+            if self.running_process and self.running_process.remaining_time == 0:
+                self.running_process.end_time = self.time
+                self.running_process.turnaround_time = self.running_process.end_time - self.running_process.arrival_time
+                self.running_process.waiting_time = self.running_process.turnaround_time - self.running_process.burst_time
+                executed_processes.append(self.running_process)
+                self.running_process = None
+
+                if not self.processes and not self.ready_queue:
+                    break
+
+            arrived_processes = self.get_arrived_processes()
+
+            if arrived_processes:
+                min_process = min(arrived_processes, key=lambda x: x.burst_time)
+
+                if self.running_process is None:
+                    self.running_process = min_process
+                    self.running_process.start_time = self.time
+
+                for _ in range(len(arrived_processes)):
+                    self.processes.popleft()
+
+                if self.running_process in arrived_processes:
+                    arrived_processes.remove(self.running_process)
+                for process in arrived_processes:
+                    self.append_to_ready_queue(process)
+                arrived_processes.clear()
+
+            # If no process is running, then pick the process from ready queue
+            if self.running_process is None and self.ready_queue:
+                self.running_process = self.ready_queue.popleft()
+                self.running_process.start_time = self.running_process.start_time or self.time
+
+            # If process is running, then get next important time and update the time
+            next_time = self.get_next_important_time()
+            if self.running_process:
+                self.running_process.remaining_time -= next_time - self.time
             else:
-                # Idle time
-                self.idle_time += 1
-                self.time += 1
+                self.idle_time += next_time - self.time
+            self.time = next_time
 
-        try:
-            avg_waiting_time = sum([process.waiting_time for process in executed_processes]) / len(executed_processes)
-        except ZeroDivisionError:
-            avg_waiting_time = 0
-
-        try:
-            avg_turnaround_time = sum([process.turnaround_time for process in executed_processes]) / len(
-                executed_processes)
-        except ZeroDivisionError:
-            avg_turnaround_time = 0
-
-        try:
-            avg_response_time = sum([process.start_time for process in executed_processes]) / len(executed_processes)
-        except ZeroDivisionError:
-            avg_response_time = 0
-
+        # Calculate total time, CPU utilization, throughput, average waiting time, average turnaround time,
+        # average response time
+        total_time = self.time
+        cpu_utilization = (total_time - self.idle_time) / total_time
+        throughput = len(executed_processes) / total_time
+        average_waiting_time = sum(process.waiting_time for process in executed_processes) / len(executed_processes)
+        average_turnaround_time = sum(process.turnaround_time for process in executed_processes) / len(
+            executed_processes)
+        average_response_time = sum(process.start_time - process.arrival_time for process in executed_processes) / len(
+            executed_processes)
         return {
             "processes": executed_processes,
-            "total_time": self.time,
-            "cpu_utilization": (self.time - self.idle_time) / self.time,
-            "throughput": len(executed_processes) / self.time,
-            "average_waiting_time": avg_waiting_time,
-            "average_turnaround_time": avg_turnaround_time,
-            "average_response_time": avg_response_time
+            "total_time": total_time,
+            "cpu_utilization": cpu_utilization,
+            "throughput": throughput,
+            "average_waiting_time": average_waiting_time,
+            "average_turnaround_time": average_turnaround_time,
+            "average_response_time": average_response_time
         }
 
-    def get_shortest_process(self):
+    def get_arrived_processes(self):
         """
-        Get the process with the shortest remaining time among arrive processes.
-        :return: Process
+        Get processes which arrived at current time.
+        :return: list of arrived processes
         """
-        min_burst_time = float("inf")
-        shortest_process = None
+        arrived_processes = []
         for process in self.processes:
-            if process.arrival_time > self.time:
+            if process.arrival_time == self.time:
+                arrived_processes.append(process)
+            else:
                 break
-            if process.burst_time < min_burst_time:
-                min_burst_time = process.burst_time
-                shortest_process = process
-        return shortest_process
+        return arrived_processes
+
+    def append_to_ready_queue(self, process):
+        """
+        Append process to ready queue based on priority.
+        :param process: process to be appended
+        """
+        bisect.insort(self.ready_queue, process)
+
+    def get_next_important_time(self):
+        """
+        Find next point of time that need a decision
+        :return: Int
+        """
+        if self.running_process is not None:
+            if not self.processes:
+                return max(self.time + self.running_process.remaining_time, self.time)
+
+            return min(
+                self.time + (self.running_process.remaining_time or 1),
+                self.processes[0].arrival_time
+            )
+
+        if self.ready_queue:
+            return self.time + 1
+
+        if self.processes:
+            return self.processes[0].arrival_time
+
+        return self.time + 1
+
+    def remove_processes(self, processes):
+        """
+        Remove processes from processes list
+        :param processes: list of processes
+        :return: None
+        """
+        for process in processes:
+            self.processes.remove(process)
