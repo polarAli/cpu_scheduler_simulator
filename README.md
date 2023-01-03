@@ -73,6 +73,15 @@ They can be installed by executing the following command:
 ```bash
 pip3 install -r requirements.txt
 ```
+## Contributing
+Contributions are welcome. Please open an issue or a pull request.
+Read [below](#adding-a-new-algorithm) for information on how to add a new algorithm.
+### Adding a new algorithm
+To add a new algorithm, follow these steps:
+1. Create a new class in `algorithms` module that inherits from `BaseAlgorithm`.
+2. Set `process_compare_prop` to the property that is used to compare processes.
+3. Implement the `run` method.
+4. Import the new algorithm in `algorithms/__init__.py`.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
