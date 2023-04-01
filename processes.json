@@ -1,0 +1,42 @@
+[
+  {
+    "pid": "A",
+    "arrival_time": 0,
+    "service_time": 6,
+    "disk_i_o_time": 1,
+    "disk_i_o_inter": {3},
+  },
+  
+  {
+    "pid": "B",
+    "arrival_time": 2,
+    "service_time": 12,
+    "disk_i_o_time": 2,
+    "disk_i_o_inter": {4,8},
+  },
+  
+  {
+    "pid": "C",
+    "arrival_time": 4,
+    "service_time": 8,
+    "disk_i_o_time": 1,
+    "disk_i_o_inter": {4},
+  },
+  
+  {
+    "pid": "D",
+    "arrival_time": 6,
+    "service_time": 10,
+    "disk_i_o_time": 0,
+    "disk_i_o_inter": {},
+  },
+  
+  {
+    "pid": "E",
+    "arrival_time": 8,
+    "service_time": 4,
+    "disk_i_o_time": 2,
+    "disk_i_o_inter": {1,3},
+  },
+ 
+]
