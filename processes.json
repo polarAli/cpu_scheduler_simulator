@@ -4,7 +4,7 @@
     "arrival_time": 0,
     "service_time": 6,
     "disk_i_o_time": 1,
-    "disk_i_o_inter": {3},
+    "disk_i_o_inter": [3]
   },
   
   {
@@ -12,7 +12,7 @@
     "arrival_time": 2,
     "service_time": 12,
     "disk_i_o_time": 2,
-    "disk_i_o_inter": {4,8},
+    "disk_i_o_inter": [4,8]
   },
   
   {
@@ -20,7 +20,7 @@
     "arrival_time": 4,
     "service_time": 8,
     "disk_i_o_time": 1,
-    "disk_i_o_inter": {4},
+    "disk_i_o_inter": [4]
   },
   
   {
@@ -28,7 +28,7 @@
     "arrival_time": 6,
     "service_time": 10,
     "disk_i_o_time": 0,
-    "disk_i_o_inter": {},
+    "disk_i_o_inter": []
   },
   
   {
@@ -36,7 +36,7 @@
     "arrival_time": 8,
     "service_time": 4,
     "disk_i_o_time": 2,
-    "disk_i_o_inter": {1,3},
-  },
+    "disk_i_o_inter": [1,3]
+  }
  
 ]

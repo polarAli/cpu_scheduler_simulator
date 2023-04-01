@@ -20,26 +20,27 @@ class Process:
         self.remaining_time = service_time
         self.disk_i_o_time = disk_i_o_time
         self.disk_i_o_inter = disk_i_o_inter
-        self.start_time = None
-        self.end_time = None
-        self.io_time = 0
-        self.turnaround_time = 0
-        self.waiting_time = 0
+        self.start_time = 'n/a'
+        self.finish_time = 'n/a'
+        self.io_time = 'n/a'
+        self.response_time = 'n/a'
+        self.turnaround_time = 'n/a'
+        self.turnaround_over_service = 'n/a'
         self.state = State.READY
 
-    @property
-    def response_time(self):
-        """
-        Return the response time of the process.
-        """
-        return self.start_time - self.arrival_time
-
+    #@property
+    #def response_time(self):
+    #    """
+    #    Return the response time of the process.
+    #    """
+    #    return self.start_time - self.arrival_time
+    
     def __str__(self):
         """
         Return a string representation of the process.
         """
-        return "pid: {}, arrival_time: {}, priority: {}, remaining_time: {}".format(
-            self.pid, self.arrival_time, self.priority, self.remaining_time
+        return "pid: {}, arrival_time: {}, remaining_time: {}, disk_i_o_inter:{}".format(
+            self.pid, self.arrival_time,  self.remaining_time, self.disk_i_o_inter
         )
 
     def __lt__(self, other):

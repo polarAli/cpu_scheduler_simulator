@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 
 import algorithms
 from process import Process
+from collections import deque
 
 parser = argparse.ArgumentParser(description='Simulate the scheduling algorithm.')
 parser.add_argument('-p', '--process', type=str, help='process.json file')
@@ -65,7 +66,7 @@ class Simulate:
                         arrival_time=process['arrival_time'],
                         service_time=process['service_time'],
                         disk_i_o_time=process['disk_i_o_time'],
-                        disk_i_o_inter=process['disk_i_o_interval']
+                        disk_i_o_inter=process['disk_i_o_inter']
                         #priority=process['priority'],
                         #compare_prop=self.AlgorithmClass.process_compare_prop
                     )
@@ -98,13 +99,13 @@ class Simulate:
         # Get the results
         self.average_response_time = result['average_response_time']
         self.average_turnaround_time = result['average_turnaround_time']
-        self.average_turnaround_over_service = result['avearage_turnaround_over_service']
+        self.average_turnaround_over_service = result['average_turnaround_over_service']
         self.throughput = result['throughput']
-        self.processes = result['processes']
+        self.processes = sorted(result['processes'],key=lambda x:x.pid)
         self.cpu_total_time = result['total_time']
 
     def print(self):
-         """
+        """
         Print the following for each process:
         1. Start time
         2. Finish time
@@ -112,10 +113,9 @@ class Simulate:
         4. Turnaround time (Tr)
         5. Ratio of Turnaround and service time (Tr/Ts)
         """
-        print('Start time \t Finish_time \t Response_time \t Turnaround_time \t Tr/Ts')
-        for process in processes:
-            print(process.start_time, ' \t ', process.finish_time, ' \t ', process.response_time, 
-                  ' \t ', process.turnaround_time, ' \t ', process.turnaround_over_service)
+        print('PID', '\t', 'Start_time','\t','Finish_time','\t','Response_time', '\t', 'Turnaround_time', '\t', 'Tr/Ts')
+        for process in self.processes:
+            print(process.pid, '\t', process.start_time, '\t\t', process.finish_time, '\t\t', process.response_time, '\t\t', process.turnaround_time, '\t\t\t', process.turnaround_over_service)
         """
         Print the following for the system:
         1. Average response time
@@ -127,7 +127,7 @@ class Simulate:
         """
         print('Average response time: %.2f' % self.average_response_time)
         print('Average turnaround time: %.2f' % self.average_turnaround_time)
-        print('Average ratio of turnaround and service time: %.2f", % self.avearage_turnaround_over_service)
+        print('Average ratio of turnaround and service time: %.2f' % self.average_turnaround_over_service)
         print('Throughput: %.6f' % self.throughput)
         print('CPU total time: %.0f' % self.cpu_total_time)
         print('Simulation time: %.10f s' % self.run_time)

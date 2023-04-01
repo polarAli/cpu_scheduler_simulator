@@ -1,5 +1,6 @@
 from algorithms.base_algorithm import BaseAlgorithm
 from state import State
+from collections import deque
 
 
 class FCFS(BaseAlgorithm):
@@ -30,34 +31,39 @@ class FCFS(BaseAlgorithm):
         executed_processes = deque([])
         while self.processes:
             process = self.processes.pop(0)
-            if process.state == state.READY:
+            #print(process)
+            if process.state == State.READY:
                 # Set process start and initial response time
-                if process.start_time == 0:
+                if process.start_time =='n/a' :
                     process.start_time = time
-                    process.response_time = time - process.arrival_time
+                    process.response_time = process.start_time - process.arrival_time
 
                 # Process next 'chunk' of work
-                if disk_i_o_inter < service_time:
-                    completed = disk_i_o_inter.pop()
-                    process.arrival_time += disk_i_o_time
-                    process.remaining_time -= completed
-                    time += completed
+                if process.disk_i_o_inter!= []:
+                    next_inter = process.disk_i_o_inter.pop(0)
+                    if next_inter < process.service_time:
+                        completed = next_inter - (process.service_time - process.remaining_time)
+                        time += completed
+                        process.remaining_time -= completed
+                        process.arrival_time += time+process.disk_i_o_time
+                        self.processes.append(process)
+                        self.processes.sort(key=lambda x: x.arrival_time)
                 else:
-                    time += service_time
+                    time += process.remaining_time
                     process.finish_time = time
                     process.turnaround_time = process.finish_time - process.start_time
                     process.turnaround_over_service = process.turnaround_time / process.service_time
                     process.state = State.EXECUTED
-                processes.append(process)
+                    executed_processes.append(process)
                 
         # Calculate throughput
-        throughput = len(processes) / time
+        throughput = len(executed_processes) / time
         return {
-            "average_response_time": self.average_response_time(processes),
-            "average_turnaround_time": self.average_turnaround_time(processes),
-            "average_turnaround_over_service": self.average_turnaround_over_service(processes),
+            "average_response_time": self.average_response_time(executed_processes),
+            "average_turnaround_time": self.average_turnaround_time(executed_processes),
+            "average_turnaround_over_service": self.average_turnaround_over_service(executed_processes),
             "throughput": throughput,
-            "processes": processes,
+            "processes": executed_processes,
             "total_time": time
         }
        
