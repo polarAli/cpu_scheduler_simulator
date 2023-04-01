@@ -38,9 +38,7 @@ class Simulate:
         self.algorithm = algorithm
         self.processes = []
         self.process_num = 0
-        self.cpu_utilization = 0
         self.throughput = 0
-        self.average_waiting_time = 0.0
         self.average_turnaround_time = 0.0
         self.average_response_time = 0.0
         self.run_time = 0
@@ -106,8 +104,20 @@ class Simulate:
         self.cpu_total_time = result['total_time']
 
     def print(self):
+         """
+        Print the following for each process:
+        1. Start time
+        2. Finish time
+        3. Response time 
+        4. Turnaround time (Tr)
+        5. Ratio of Turnaround and service time (Tr/Ts)
         """
-        Plot the following:
+        print('Start time \t Finish_time \t Response_time \t Turnaround_time \t Tr/Ts')
+        for process in processes:
+            print(process.start_time, ' \t ', process.finish_time, ' \t ', process.response_time, 
+                  ' \t ', process.turnaround_time, ' \t ', process.turnaround_over_service)
+        """
+        Print the following for the system:
         1. Average response time
         2. Average turnaround time
         3. Average Tr/Ts
