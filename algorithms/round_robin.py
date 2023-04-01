@@ -5,8 +5,7 @@ from algorithms.base_algorithm import BaseAlgorithm
 
 
 class RR(BaseAlgorithm):
-    quantum = 4
-    process_compare_prop = 'priority'
+    quantum = 1
 
     def __init__(self, processes):
         super().__init__(processes)
