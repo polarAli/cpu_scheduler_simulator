@@ -2,9 +2,9 @@ from algorithms.base_algorithm import BaseAlgorithm
 from state import State
 
 
-class FIFO(BaseAlgorithm):
+class FCFS(BaseAlgorithm):
     """
-    FIFO algorithm for scheduling processes
+    FCFS algorithm for scheduling processes
     """
 
     def __init__(self, processes):
@@ -27,53 +27,40 @@ class FIFO(BaseAlgorithm):
         """
         time = 0.0
         processes = []
-        cpu_idle_time = 0.0
+        executed_processes = deque([])
         while self.processes:
             process = self.processes.pop(0)
+            if process.state == state.READY:
+                # Set process start and initial response time
+                if process.start_time == 0:
+                    process.start_time = time
+                    process.response_time = time - process.arrival_time
 
-            # If we have idle time, add it to the CPU idle time
-            if process.arrival_time > time:
-                cpu_idle_time += process.arrival_time - time
-                time = process.arrival_time
-
-            # Calculate the waiting time
-            process.waiting_time = time - process.arrival_time
-            # Set process start time
-            process.start_time = time
-            # Calculate the turnaround time
-            process.turnaround_time = process.response_time + process.burst_time
-            # Run the process
-            process.start_time = time
-            time += process.burst_time
-            process.end_time = time
-            # Change the state of the process
-            process.state = State.EXECUTED
-            processes.append(process)
-
-        # Calculate CPU utilization
-        cpu_utilization = (time - cpu_idle_time) / time
+                # Process next 'chunk' of work
+                if disk_i_o_inter < service_time:
+                    completed = disk_i_o_inter.pop()
+                    process.arrival_time += disk_i_o_time
+                    process.remaining_time -= completed
+                    time += completed
+                else:
+                    time += service_time
+                    process.finish_time = time
+                    process.turnaround_time = process.finish_time - process.start_time
+                    process.turnaround_over_service = process.turnaround_time / process.service_time
+                    process.state = State.EXECUTED
+                processes.append(process)
+                
         # Calculate throughput
         throughput = len(processes) / time
         return {
-            "processes": processes,
-            "total_time": time,
-            "cpu_utilization": cpu_utilization,
-            "throughput": throughput,
-            "average_waiting_time": self.average_waiting_time(processes),
+            "average_response_time": self.average_response_time(processes),
             "average_turnaround_time": self.average_turnaround_time(processes),
-            "average_response_time": self.average_response_time(processes)
+            "average_turnaround_over_service": self.average_turnaround_over_service(processes),
+            "throughput": throughput,
+            "processes": processes,
+            "total_time": time
         }
 
-    def average_waiting_time(self, processes):
-        """
-        Calculate average waiting time
-        :param processes: list of executed processes
-        :return: average waiting time
-        """
-        total_waiting_time = 0
-        for process in processes:
-            total_waiting_time += process.waiting_time
-        return total_waiting_time / len(processes)
 
     def average_turnaround_time(self, processes):
         """
@@ -96,3 +83,14 @@ class FIFO(BaseAlgorithm):
         for process in processes:
             total_response_time += process.response_time
         return total_response_time / len(processes)
+    
+    def average_turnaround_over_service(self, processes):
+        """
+        Calculate average ratio of turnaround over service
+        :param processes: list of executed processes
+        :return: average ratio of turnaround over service
+        """
+        total_ratio = 0
+        for process in processes:
+            total_ratio += process.turnaround_over_service
+        return total_ratio / len(processes)
