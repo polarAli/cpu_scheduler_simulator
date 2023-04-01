@@ -60,8 +60,7 @@ class FCFS(BaseAlgorithm):
             "processes": processes,
             "total_time": time
         }
-
-
+       
     def average_turnaround_time(self, processes):
         """
         Calculate average turnaround time
